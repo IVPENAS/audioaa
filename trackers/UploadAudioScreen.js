@@ -1,35 +1,24 @@
 // UploadAudioScreen.js
-import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Image,
-  PermissionsAndroid,
-} from "react-native";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
-import { Picker } from "@react-native-picker/picker";
-import * as Permissions from "expo-permissions";
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Image, Platform } from 'react-native';
+import * as MediaLibrary from 'expo-media-library';
+import { Picker } from '@react-native-picker/picker';
 
 const UploadAudioScreen = () => {
   const [audioFile, setAudioFile] = useState(null);
-  const [audioType, setAudioType] = useState("mp3");
+  const [audioType, setAudioType] = useState('mp3');
 
   const handleAudioUpload = async () => {
     if (audioFile) {
       const formData = new FormData();
-
-      // Update 'audio' to match the field name expected by the server
       formData.append('audio', {
-        uri: audioFile,
+        uri: audioFile.uri,
         type: `audio/${audioType}`,
         name: `upload.${audioType}`,
       });
 
       try {
-        const response = await fetch('http://localhost:5000/api/upload', {
+        const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/upload', {
           method: 'POST',
           body: formData,
           headers: {
@@ -49,33 +38,21 @@ const UploadAudioScreen = () => {
     } else {
       console.log('No file selected');
     }
-  };  
+  };
 
   const pickFile = async () => {
-    try {
-      const granted = await Permissions.askAsync(
-        Permissions.AUDIO_RECORDING,
-        Permissions.MEDIA_LIBRARY
-      );
+    const permissionResult = await MediaLibrary.requestPermissionsAsync();
+    if (permissionResult.granted) {
+      const media = await MediaLibrary.getAssetsAsync({
+        mediaType: 'audio',
+      });
 
-      if (granted.status === "granted") {
-        const { uri } = await FileSystem.getInfoAsync({
-          type: "library",
-          allowsEditing: false,
-          multiple: false,
-          mimeType: "audio/*",
-        });
-
-        setAudioFile(uri);
-      } else {
-        console.log("Permissions not granted.");
+      if (media.assets.length > 0) {
+        const selectedAudio = media.assets[0];
+        setAudioFile({ uri: selectedAudio.uri });
       }
-    } catch (err) {
-      if (err.name === "Cancel") {
-        // User cancelled the picker, no action needed
-      } else {
-        throw err;
-      }
+    } else {
+      alert('You need to enable permission to access the library.');
     }
   };
 
@@ -93,14 +70,12 @@ const UploadAudioScreen = () => {
         <TouchableOpacity onPress={pickFile} style={styles.uploadImageContainer}>
           {audioFile ? (
             <Image
-              source={{
-                uri: audioFile,
-              }}
+              source={{ uri: audioFile.uri }}
               style={styles.uploadImage}
             />
           ) : (
             <Image
-              source={require("../assets/UploadButton.png")}
+              source={require('../assets/UploadButton.png')}
               style={styles.uploadImage}
             />
           )}
@@ -110,7 +85,7 @@ const UploadAudioScreen = () => {
         <Picker
           style={styles.picker}
           selectedValue={audioType}
-          onValueChange={(itemValue, itemIndex) => setAudioType(itemValue)}
+          onValueChange={(itemValue) => setAudioType(itemValue)}
         >
           <Picker.Item label="MP3" value="mp3" />
           <Picker.Item label="WAV" value="wav" />
