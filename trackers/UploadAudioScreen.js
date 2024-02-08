@@ -1,4 +1,4 @@
-//UploadAudioScreen.js
+// Corrected imports
 import React, { useState } from "react";
 import {
   View,
@@ -12,17 +12,6 @@ import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import { Picker } from "@react-native-picker/picker";
 import * as Permissions from "expo-permissions";
-
-import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import * as FileSystem from "expo-file-system";
-import { Picker } from "@react-native-picker/picker";
 
 const UploadAudioScreen = () => {
   const [audioFile, setAudioFile] = useState(null);
