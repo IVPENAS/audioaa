@@ -1,7 +1,7 @@
-// UploadAudioScreen.js
+//UploadAudioScreen.js
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, Platform } from 'react-native';
-import * as MediaLibrary from 'expo-media-library';
+import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { Picker } from '@react-native-picker/picker';
 
 const UploadAudioScreen = () => {
@@ -13,8 +13,8 @@ const UploadAudioScreen = () => {
       const formData = new FormData();
       formData.append('audio', {
         uri: audioFile.uri,
-        type: `audio/${audioType}`,
-        name: `upload.${audioType}`,
+        type: audioFile.type,
+        name: audioFile.name,
       });
 
       try {
@@ -41,18 +41,18 @@ const UploadAudioScreen = () => {
   };
 
   const pickFile = async () => {
-    const permissionResult = await MediaLibrary.requestPermissionsAsync();
-    if (permissionResult.granted) {
-      const media = await MediaLibrary.getAssetsAsync({
-        mediaType: 'audio',
-      });
-
-      if (media.assets.length > 0) {
-        const selectedAudio = media.assets[0];
-        setAudioFile({ uri: selectedAudio.uri });
+    try {
+      const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
+      if (result.type === 'success') {
+        setAudioFile({ uri: result.uri, type: result.mimeType, name: result.name });
+        // Update audioType based on mimeType if necessary
       }
-    } else {
-      alert('You need to enable permission to access the library.');
+    } catch (error) {
+      if (DocumentPicker.isCancel(error)) {
+        console.log('User cancelled the picker');
+      } else {
+        console.error('Document Picker Error: ', error);
+      }
     }
   };
 
@@ -70,7 +70,7 @@ const UploadAudioScreen = () => {
         <TouchableOpacity onPress={pickFile} style={styles.uploadImageContainer}>
           {audioFile ? (
             <Image
-              source={{ uri: audioFile.uri }}
+              source={{ uri: 'file://' + audioFile.uri }}
               style={styles.uploadImage}
             />
           ) : (

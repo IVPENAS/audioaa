@@ -1,29 +1,26 @@
+//server.js
 const express = require('express');
 const mongoose = require('mongoose');
-const fileUploadRoute = require('./fileUpload');
+const fileUploadRoute = require('./fileUpload'); // Ensure the path is correct
 
 const app = express();
 
-// Use environment variable for MongoDB URI
+// MongoDB connection setup
 const mongoURI = process.env.MONGODB_URI;
-
-if (!mongoURI) {
-  console.error('MongoDB URI is not set. Please set the MONGODB_URI environment variable.');
-  process.exit(1); // Exit the application if the MongoDB URI is not set
-}
-
-mongoose.connect(mongoURI)
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.log(err));
+  .catch(err => console.error('MongoDB connection error:', err));
 
-app.use(express.json());
-app.use('/uploads', express.static('uploads'));
-app.use('/api/upload', fileUploadRoute);
+// Middleware
+app.use(express.json()); // For parsing application/json
+app.use('/uploads', express.static('uploads')); // Serve files from 'uploads' directory
+app.use('/api/upload', fileUploadRoute); // File upload route
 
-// Add a simple route for the root URL
+// Root route
 app.get('/', (req, res) => {
   res.send('Welcome to the File Upload Service');
 });
 
-const PORT = process.env.PORT || 5000; // Fallback to 5000 for local development
+// Start server
+const PORT = process.env.PORT || 5000; // Use the environment variable or default to 5000
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
