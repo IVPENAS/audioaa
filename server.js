@@ -1,4 +1,4 @@
-//server.js
+//server
 const express = require('express');
 const mongoose = require('mongoose');
 const fileUploadRoute = require('./fileUpload'); // Ensure the path is correct

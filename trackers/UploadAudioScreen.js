@@ -7,17 +7,20 @@ import { Picker } from '@react-native-picker/picker';
 const UploadAudioScreen = () => {
   const [audioFile, setAudioFile] = useState(null);
   const [audioType, setAudioType] = useState('mp3');
-  const [fileName, setFileName] = useState(''); // Added state for file name
+  const [fileName, setFileName] = useState('');
 
   const handleAudioUpload = async () => {
+    console.log('File selected for upload:', audioFile);
     if (audioFile) {
+      console.log('Uploading audio file:', audioFile);
+  
       const formData = new FormData();
       formData.append('audio', {
         uri: audioFile.uri,
         type: audioFile.type,
         name: audioFile.name,
       });
-
+  
       try {
         const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/upload', {
           method: 'POST',
@@ -26,7 +29,9 @@ const UploadAudioScreen = () => {
             'Content-Type': 'multipart/form-data',
           },
         });
-
+  
+        console.log('Upload response:', response);
+  
         if (response.ok) {
           const result = await response.json();
           console.log('Upload successful', result);
@@ -40,23 +45,32 @@ const UploadAudioScreen = () => {
       console.log('No file selected');
     }
   };
-
+  
   const pickFile = async () => {
     try {
+      console.log('Opening file picker...');
       const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
+  
+      console.log('File picker result:', result);
+  
       if (result.type === 'success') {
-        setAudioFile({ uri: result.uri, type: result.mimeType, name: result.name });
-        setFileName(result.name); // Update the file name state
+        console.log('File picked successfully:', result);
+        // Access the first item in the assets array
+        const selectedFile = result.assets[0];
+        setAudioFile((prevAudioFile) => {
+          console.log('Audio file state:', prevAudioFile);
+          return { uri: selectedFile.uri, type: selectedFile.mimeType, name: selectedFile.name };
+        });
+        setFileName(selectedFile.name);
+      } else if (result.type === 'cancel') {
+        console.log('User cancelled the file picker');
       }
     } catch (error) {
-      if (DocumentPicker.isCancel(error)) {
-        console.log('User cancelled the picker');
-      } else {
-        console.error('Document Picker Error: ', error);
-      }
+      console.error('Document Picker Error: ', error);
     }
   };
-
+  
+  
   return (
     <View style={styles.container}>
       <View style={styles.frame}>

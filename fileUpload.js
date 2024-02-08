@@ -23,28 +23,33 @@ const upload = multer({ storage: storage });
 
 // POST endpoint for uploading an audio file
 router.post('/', upload.single('audio'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).send('No file uploaded.');
-  }
-
   try {
+    console.log('Received a file upload request:', req.file);
+
+    if (!req.file) {
+      console.log('No file uploaded.');
+      return res.status(400).send('No file uploaded.');
+    }
+
     // Create a new document in the database for the uploaded audio
     const newAudio = new Audio({
       fileName: req.file.filename,
-      uploadDate: new Date(), // This is redundant if you're using default Date.now in your schema
-      duration: req.body.duration ? parseInt(req.body.duration, 10) : undefined, // Example for additional fields
+      uploadDate: new Date(),
+      duration: req.body.duration ? parseInt(req.body.duration, 10) : undefined,
       metadata: {
         format: req.file.mimetype,
         size: req.file.size.toString(),
         // Add more metadata as needed
       },
-      uploadedBy: req.body.uploadedBy || 'anonymous', // Example: Extract uploader info if provided
+      uploadedBy: req.body.uploadedBy || 'anonymous',
     });
     
     const savedAudio = await newAudio.save();
+    console.log('Audio information saved:', savedAudio);
+
     res.status(201).json(savedAudio);
   } catch (error) {
-    console.error(error);
+    console.error('Error during audio file upload:', error);
     res.status(500).json({ error: 'Error saving audio file information to the database.' });
   }
 });
