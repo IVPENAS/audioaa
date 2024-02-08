@@ -7,6 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 const UploadAudioScreen = () => {
   const [audioFile, setAudioFile] = useState(null);
   const [audioType, setAudioType] = useState('mp3');
+  const [fileName, setFileName] = useState(''); // Added state for file name
 
   const handleAudioUpload = async () => {
     if (audioFile) {
@@ -45,7 +46,7 @@ const UploadAudioScreen = () => {
       const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
       if (result.type === 'success') {
         setAudioFile({ uri: result.uri, type: result.mimeType, name: result.name });
-        // Update audioType based on mimeType if necessary
+        setFileName(result.name); // Update the file name state
       }
     } catch (error) {
       if (DocumentPicker.isCancel(error)) {
