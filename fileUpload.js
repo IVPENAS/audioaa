@@ -1,42 +1,36 @@
-// fileUpload.js
+//fileUpload.js
 const express = require('express');
 const multer = require('multer');
-const Audio = require('./AudioModel'); // Ensure this path is correct
+const path = require('path');
+const Audio = require('./AudioModel');
 
 const router = express.Router();
 
-// Configure storage for multer
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// Update 'audio' to match the field name used in the client-side FormData
+const upload = multer({ 
+  storage: multer.diskStorage({
+    destination: function(req, file, cb) {
+      cb(null, './uploads');
+    },
+    filename: function(req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+  }),
+});
 
-// POST endpoint for uploading an audio file
 router.post('/', upload.single('audio'), async (req, res) => {
   try {
-    if (!req.file) {
-      console.log('No file uploaded.');
-      return res.status(400).send('No file uploaded.');
-    }
-
-    // Create a new document in the database for the uploaded audio
     const newAudio = new Audio({
-      fileName: req.file.originalname,
+      fileName: req.file.filename,
       uploadDate: new Date(),
-      duration: parseInt(req.body.duration, 10) || undefined,
-      metadata: {
-        format: req.file.mimetype,
-        size: req.file.size.toString(),
-        // Add more metadata as needed
-      },
-      uploadedBy: req.body.uploadedBy || 'anonymous',
+      metadata: { format: req.file.mimetype, size: req.file.size },
     });
-
-    const savedAudio = await newAudio.save();
-    console.log('Audio information saved:', savedAudio);
-
-    res.status(201).json(savedAudio);
+    
+    await newAudio.save();
+    res.status(201).json(newAudio);
   } catch (error) {
-    console.error('Error during audio file upload:', error);
-    res.status(500).json({ error: 'Error saving audio file information to the database.' });
+    console.error(error);
+    res.status(500).json({ error: 'Error uploading file' });
   }
 });
 
