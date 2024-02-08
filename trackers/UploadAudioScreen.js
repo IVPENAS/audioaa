@@ -25,9 +25,6 @@ const UploadAudioScreen = () => {
         const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/upload', {
           method: 'POST',
           body: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
         });
 
         console.log('Upload response:', response);
