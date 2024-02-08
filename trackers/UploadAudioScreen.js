@@ -1,5 +1,5 @@
 // UploadAudioScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { Picker } from '@react-native-picker/picker';
@@ -43,6 +43,11 @@ const UploadAudioScreen = () => {
     }
   };
 
+  useEffect(() => {
+    // Log audioFile state after it has been updated
+    console.log('Audio file state:', audioFile);
+  }, [audioFile]); // Only re-run the effect if audioFile changes
+
   const pickFile = async () => {
     try {
       console.log('Opening file picker...');
@@ -58,7 +63,7 @@ const UploadAudioScreen = () => {
         setFileName(selectedFile.name);
 
         // Log audioFile state immediately after setting it
-        console.log('Audio file state:', audioFile);
+        console.log('Audio file state immediately after setting:', audioFile);
       } else if (result.type === 'cancel') {
         console.log('User cancelled the file picker');
       }
@@ -66,7 +71,6 @@ const UploadAudioScreen = () => {
       console.error('Document Picker Error: ', error);
     }
   };
-  
   
   return (
     <View style={styles.container}>
