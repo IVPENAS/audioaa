@@ -1,4 +1,4 @@
-//UploadAudioScreen.js
+// UploadAudioScreen.js
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
@@ -13,14 +13,14 @@ const UploadAudioScreen = () => {
     console.log('File selected for upload:', audioFile);
     if (audioFile) {
       console.log('Uploading audio file:', audioFile);
-  
+
       const formData = new FormData();
       formData.append('audio', {
         uri: audioFile.uri,
         type: audioFile.type,
         name: audioFile.name,
       });
-  
+
       try {
         const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/upload', {
           method: 'POST',
@@ -29,9 +29,9 @@ const UploadAudioScreen = () => {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         console.log('Upload response:', response);
-  
+
         if (response.ok) {
           const result = await response.json();
           console.log('Upload successful', result);
@@ -45,23 +45,23 @@ const UploadAudioScreen = () => {
       console.log('No file selected');
     }
   };
-  
+
   const pickFile = async () => {
     try {
       console.log('Opening file picker...');
       const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
-  
+
       console.log('File picker result:', result);
-  
+
       if (result.type === 'success') {
         console.log('File picked successfully:', result);
         // Access the first item in the assets array
         const selectedFile = result.assets[0];
-        setAudioFile((prevAudioFile) => {
-          console.log('Audio file state:', prevAudioFile);
-          return { uri: selectedFile.uri, type: selectedFile.mimeType, name: selectedFile.name };
-        });
+        setAudioFile({ uri: selectedFile.uri, type: selectedFile.mimeType, name: selectedFile.name });
         setFileName(selectedFile.name);
+
+        // Log audioFile state immediately after setting it
+        console.log('Audio file state:', audioFile);
       } else if (result.type === 'cancel') {
         console.log('User cancelled the file picker');
       }
