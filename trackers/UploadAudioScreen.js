@@ -1,5 +1,5 @@
 // UploadAudioScreen.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { Picker } from '@react-native-picker/picker';
@@ -9,68 +9,60 @@ const UploadAudioScreen = () => {
   const [audioType, setAudioType] = useState('mp3');
   const [fileName, setFileName] = useState('');
 
-  const handleAudioUpload = async () => {
-    console.log('File selected for upload:', audioFile);
-    if (audioFile) {
-      console.log('Uploading audio file:', audioFile);
-
-      const formData = new FormData();
-      formData.append('audio', {
-        uri: audioFile.uri,
-        type: audioFile.type,
-        name: audioFile.name,
-      });
-
-      try {
-        const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        console.log('Upload response:', response);
-
-        if (response.ok) {
-          const result = await response.json();
-          console.log('Upload successful', result);
-        } else {
-          console.log('Upload failed', response.statusText);
-        }
-      } catch (error) {
-        console.error('Upload failed', error);
-      }
-    } else {
-      console.log('No file selected');
-    }
-  };
-
-  useEffect(() => {
-    // Log audioFile state after it has been updated
-    console.log('Audio file state:', audioFile);
-  }, [audioFile]); // Only re-run the effect if audioFile changes
-
   const pickFile = async () => {
     try {
       console.log('Opening file picker...');
       const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
-
-      console.log('File picker result:', result);
-
+      console.log('File picker result:', result); // Debugging: Log the result to see what's returned
+  
       if (result.type === 'success') {
-        console.log('File picked successfully:', result);
-        // Access the first item in the assets array
         const selectedFile = result.assets[0];
+        console.log('File picked successfully:', selectedFile);
         setAudioFile({ uri: selectedFile.uri, type: selectedFile.mimeType, name: selectedFile.name });
         setFileName(selectedFile.name);
-
-        // Log audioFile state immediately after setting it
-        console.log('Audio file state immediately after setting:', audioFile);
+  
+        // Now that the file is picked and the state is set, you can call handleAudioUpload
+        // Ensure you're passing the correct object structure
+        handleAudioUpload({ uri: selectedFile.uri, type: selectedFile.mimeType, name: selectedFile.name });
       } else if (result.type === 'cancel') {
         console.log('User cancelled the file picker');
       }
     } catch (error) {
-      console.error('Document Picker Error: ', error);
+      console.error('Document Picker Error:', error);
     }
   };
+  
+
+  const handleAudioUpload = async (file) => {
+    console.log('Uploading audio file:', file);
+  
+    const formData = new FormData();
+    formData.append('audio', {
+      uri: file.uri,
+      type: file.type,
+      name: file.name,
+    });
+  
+    try {
+      const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          // 'Content-Type': 'multipart/form-data' is intentionally omitted
+          // so that the boundary string is automatically added by the fetch API
+        },
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Upload successful:', result);
+      } else {
+        console.log('Upload failed:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
+  };  
   
   return (
     <View style={styles.container}>
@@ -174,7 +166,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 20,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center", 
   },
   uploadImage: {
     width: 300,
