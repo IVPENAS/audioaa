@@ -1,31 +1,17 @@
-//fileUpload.js
+// fileUpload.js
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
 const Audio = require('./AudioModel'); // Ensure this path is correct
 
 const router = express.Router();
 
 // Configure storage for multer
-const storage = multer.diskStorage({
-  // Destination for the uploaded files
-  destination: function(req, file, cb) {
-    cb(null, './uploads');
-  },
-  // Add file extension to the uploaded files
-  filename: function(req, file, cb) {
-    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-  }
-});
-
-// Initialize upload with the storage configuration
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // POST endpoint for uploading an audio file
 router.post('/', upload.single('audio'), async (req, res) => {
   try {
-    console.log('Received a file upload request:', req.file);
-
     if (!req.file) {
       console.log('No file uploaded.');
       return res.status(400).send('No file uploaded.');
@@ -33,9 +19,9 @@ router.post('/', upload.single('audio'), async (req, res) => {
 
     // Create a new document in the database for the uploaded audio
     const newAudio = new Audio({
-      fileName: req.file.filename,
+      fileName: req.file.originalname,
       uploadDate: new Date(),
-      duration: req.body.duration ? parseInt(req.body.duration, 10) : undefined,
+      duration: parseInt(req.body.duration, 10) || undefined,
       metadata: {
         format: req.file.mimetype,
         size: req.file.size.toString(),
@@ -43,7 +29,7 @@ router.post('/', upload.single('audio'), async (req, res) => {
       },
       uploadedBy: req.body.uploadedBy || 'anonymous',
     });
-    
+
     const savedAudio = await newAudio.save();
     console.log('Audio information saved:', savedAudio);
 
