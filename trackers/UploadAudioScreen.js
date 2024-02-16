@@ -1,5 +1,5 @@
 // UploadAudioScreen.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { Picker } from '@react-native-picker/picker';
@@ -9,60 +9,69 @@ const UploadAudioScreen = () => {
   const [audioType, setAudioType] = useState('mp3');
   const [fileName, setFileName] = useState('');
 
+  useEffect(() => {
+    console.log('audioFile state updated:', JSON.stringify(audioFile, null, 2));
+  }, [audioFile]);
+
   const pickFile = async () => {
     try {
       console.log('Opening file picker...');
       const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
-      console.log('File picker result:', result); // Debugging: Log the result to see what's returned
+      console.log('File picker result:', JSON.stringify(result, null, 2));
   
-      if (result.type === 'success') {
+      if (result.assets && result.assets.length > 0) {
         const selectedFile = result.assets[0];
-        console.log('File picked successfully:', selectedFile);
-        setAudioFile({ uri: selectedFile.uri, type: selectedFile.mimeType, name: selectedFile.name });
+        console.log('File picked successfully:', JSON.stringify(selectedFile, null, 2));
+        setAudioFile({
+          uri: selectedFile.uri,
+          type: selectedFile.mimeType || 'audio/mpeg',
+          name: selectedFile.name,
+        });
         setFileName(selectedFile.name);
-  
-        // Now that the file is picked and the state is set, you can call handleAudioUpload
-        // Ensure you're passing the correct object structure
-        handleAudioUpload({ uri: selectedFile.uri, type: selectedFile.mimeType, name: selectedFile.name });
-      } else if (result.type === 'cancel') {
-        console.log('User cancelled the file picker');
+      } else {
+        console.log('No file was selected or an unexpected error occurred.');
       }
     } catch (error) {
-      console.error('Document Picker Error:', error);
+      console.error('Error picking file:', error);
     }
   };
   
 
-  const handleAudioUpload = async (file) => {
-    console.log('Uploading audio file:', file);
-  
+  const handleAudioUpload = async () => {
+    if (!audioFile || !audioFile.uri) {
+      console.warn('No audio file selected for upload.');
+      return;
+    }
+
+    console.log('Preparing to upload audio file:', JSON.stringify(audioFile, null, 2));
+
     const formData = new FormData();
     formData.append('audio', {
-      uri: file.uri,
-      type: file.type,
-      name: file.name,
+      uri: audioFile.uri,
+      type: audioFile.type,
+      name: audioFile.name,
     });
-  
+
     try {
+      console.log('Sending request to upload file:', audioFile.name);
       const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/upload', {
         method: 'POST',
         body: formData,
         headers: {
-          // 'Content-Type': 'multipart/form-data' is intentionally omitted
-          // so that the boundary string is automatically added by the fetch API
+          'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       if (response.ok) {
         const result = await response.json();
-        console.log('Upload successful:', result);
+        console.log('Upload successful. Server response:', JSON.stringify(result, null, 2));
       } else {
-        console.log('Upload failed:', response.statusText);
+        console.warn('Upload failed. HTTP status:', response.status);
       }
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error('Upload failed with error:', error);
     }
-  };  
+  };
   
   return (
     <View style={styles.container}>
@@ -100,7 +109,7 @@ const UploadAudioScreen = () => {
           <Picker.Item label="M4A" value="m4a" />
         </Picker>
 
-        <TouchableOpacity onPress={handleAudioUpload} style={styles.calculateButton}>
+        <TouchableOpacity onPress={() => handleAudioUpload(audioFile)} style={styles.calculateButton}>
           <Text style={styles.calculateText}>Upload Audio</Text>
         </TouchableOpacity>
       </View>
