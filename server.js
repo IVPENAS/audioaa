@@ -26,12 +26,17 @@ app.use('/api/upload', fileUploadRoute);
 app.get('/api/audios', async (req, res) => {
   try {
     const audios = await Audio.find();
-    res.json(audios);
+    const updatedAudios = audios.map(audio => {
+      const fullUri = `${req.protocol}://${req.get('host')}/uploads/${audio.fileName}`;
+      return { ...audio._doc, fullUri };
+    });
+    res.json(updatedAudios);
   } catch (err) {
     console.error('Error fetching audios:', err);
     res.status(500).json({ message: "Failed to fetch audio files", error: err });
   }
 });
+
 
 app.get('/', (req, res) => {
   res.send('Welcome to the File Upload Service');

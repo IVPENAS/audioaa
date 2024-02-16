@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Audio } from 'expo-av';
 
 export default function AudioFileScreen() {
@@ -8,13 +8,21 @@ export default function AudioFileScreen() {
 
   useEffect(() => {
     fetchAudioFiles();
-    return sound ? () => sound.unloadAsync() : undefined;
+  }, []);
+
+  useEffect(() => {
+    return sound ? () => {
+      console.log('Unloading Sound');
+      sound.unloadAsync();
+    } : undefined;
   }, [sound]);
 
   const fetchAudioFiles = async () => {
+    console.log('Fetching audio files from backend');
     try {
       const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/audios');
       const data = await response.json();
+      console.log('Audio files fetched:', data);
       setAudioFiles(data);
     } catch (error) {
       console.error('Error fetching audio files:', error);
@@ -22,15 +30,26 @@ export default function AudioFileScreen() {
   };
 
   const playSound = async (uri) => {
-    console.log('Loading Sound to play');
+    console.log('Loading Sound with URI:', uri);
+    if (!uri) {
+      console.error('URI is null, cannot load the audio file.');
+      return;
+    }
+
     if (sound) {
+      console.log('Unloading previous sound');
       await sound.unloadAsync();
     }
-    const { sound: newSound } = await Audio.Sound.createAsync({ uri });
-    setSound(newSound);
 
-    console.log('Playing Sound');
-    await newSound.playAsync();
+    try {
+      console.log('Creating new sound object');
+      const { sound: newSound } = await Audio.Sound.createAsync({ uri });
+      setSound(newSound);
+      console.log('Playing sound');
+      await newSound.playAsync();
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
   };
 
   return (
@@ -39,7 +58,7 @@ export default function AudioFileScreen() {
         data={audioFiles}
         keyExtractor={item => item._id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => playSound(item.uri)}>
+          <TouchableOpacity style={styles.item} onPress={() => playSound(item.fileName)}>
             <Text style={styles.title}>{item.originalFileName || 'Audio File'}</Text>
           </TouchableOpacity>
         )}
@@ -47,7 +66,7 @@ export default function AudioFileScreen() {
     </View>
   );
 }
-
+// The styles remain unchanged
 const styles = StyleSheet.create({
   container: {
     flex: 1,
