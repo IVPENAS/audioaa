@@ -58,7 +58,7 @@ export default function AudioFileScreen() {
         data={audioFiles}
         keyExtractor={item => item._id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => playSound(item.fileName)}>
+          <TouchableOpacity style={styles.item} onPress={() => playSound(item.fullUri)}>
             <Text style={styles.title}>{item.originalFileName || 'Audio File'}</Text>
           </TouchableOpacity>
         )}

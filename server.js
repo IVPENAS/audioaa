@@ -1,42 +1,57 @@
+//server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const fileUploadRoute = require('./fileUpload');
-const Audio = require('./AudioModel'); // Ensure this path is correct
-
+const multer = require('multer');
+const { GridFsStorage } = require('multer-gridfs-storage');
 const app = express();
 
 // MongoDB URI from environment variable
 const mongoURI = process.env.MONGODB_URI;
-if (!mongoURI) {
-  console.error('MongoDB URI is not set. Please set the MONGODB_URI environment variable.');
-  process.exit(1);
-}
 
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.log(err));
+  .catch(err => console.error('MongoDB Connection Error:', err));
 
-app.use(cors()); // Enable CORS
-app.use(express.json()); // For parsing application/json
-app.use('/uploads', express.static('uploads')); // Serve static files from 'uploads'
-app.use('/api/upload', fileUploadRoute);
+app.use(cors());
+app.use(express.json());
 
-// New route to fetch all audio files
-app.get('/api/audios', async (req, res) => {
-  try {
-    const audios = await Audio.find();
-    const updatedAudios = audios.map(audio => {
-      const fullUri = `${req.protocol}://${req.get('host')}/uploads/${audio.fileName}`;
-      return { ...audio._doc, fullUri };
-    });
-    res.json(updatedAudios);
-  } catch (err) {
-    console.error('Error fetching audios:', err);
-    res.status(500).json({ message: "Failed to fetch audio files", error: err });
+// Initialize GridFS Storage
+const storage = new GridFsStorage({
+  url: mongoURI,
+  options: { useUnifiedTopology: true },
+  file: (req, file) => {
+    return {
+      filename: file.originalname,
+      bucketName: 'uploads' // Match the collection name
+    };
   }
 });
 
+const upload = multer({ storage });
+
+// Route for uploading files
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  if (req.file) {
+    console.log('File Uploaded:', req.file.filename);
+    res.json({ message: 'File uploaded successfully', file: req.file.filename });
+  } else {
+    res.status(400).send('File upload failed');
+  }
+});
+
+// Route to access the uploaded file
+app.get('/files/:filename', (req, res) => {
+  const collection = mongoose.connection.db.collection('uploads.files'); // The files collection
+  collection.findOne({ filename: req.params.filename }, (err, file) => {
+    if (!file) {
+      return res.status(404).send('File not found');
+    }
+
+    const readStream = mongoose.connection.db.gridFSBucket.openDownloadStreamByName(req.params.filename);
+    readStream.pipe(res);
+  });
+});
 
 app.get('/', (req, res) => {
   res.send('Welcome to the File Upload Service');
