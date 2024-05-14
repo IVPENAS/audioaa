@@ -31,7 +31,7 @@ const storage = new GridFsStorage({
 const upload = multer({ storage });
 
 // Route for uploading files
-app.post('/api/upload', upload.single('file'), (req, res) => {
+app.post('/api/upload', upload.single('audio'), (req, res) => {
   if (req.file) {
     console.log('File Uploaded:', req.file.filename);
     res.json({ message: 'File uploaded successfully', file: req.file.filename });
