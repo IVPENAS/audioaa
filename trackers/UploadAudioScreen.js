@@ -1,83 +1,78 @@
-import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
-import * as DocumentPicker from "expo-document-picker";
-import { Picker } from "@react-native-picker/picker";
-import { Audio } from "expo-av";
-import { useNavigation } from '@react-navigation/native';
+// UploadAudioScreen.js
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
+import { Picker } from '@react-native-picker/picker';
 
 const UploadAudioScreen = () => {
   const [audioFile, setAudioFile] = useState(null);
-  const [audioType, setAudioType] = useState("mp3");
-  const [fileName, setFileName] = useState(""); // Add state for the file name
-  const [recordingsList, setRecordingsList] = useState([]); // Recordings list state
+  const [audioType, setAudioType] = useState('mp3');
+  const [fileName, setFileName] = useState('');
 
-  const navigation = useNavigation(); // Navigation hook
-
-  const handleAudioUpload = async () => {
-    if (audioFile) {
-      try {
-        const asset = await MediaLibrary.createAssetAsync(audioFile);
-        console.log("Asset object:", asset);
-        console.log("Audio file uploaded successfully:", asset.uri);
-        const newRecording = { uri: asset.uri, name: fileName };
-
-        setRecordingsList(prevRecordings => [...prevRecordings, newRecording]);
-        navigation.navigate('AudioFilesScreen', { recordingsList: [...recordingsList, newRecording] }); // Navigate to AudioFilesScreen with updated list
-      } catch (error) {
-        console.error("Error uploading audio file:", error);
-      }
-    } else {
-      console.log("No audio file selected.");
-    }
-  };
+  useEffect(() => {
+    console.log('audioFile state updated:', JSON.stringify(audioFile, null, 2));
+  }, [audioFile]);
 
   const pickFile = async () => {
     try {
-      console.log("Requesting media library permissions...");
-      const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
-      console.log("Media library permission status:", mediaLibraryPermission.status);
-
-      console.log("Requesting audio recording permissions...");
-      const audioRecordingPermission = await Audio.requestPermissionsAsync();
-      console.log("Audio recording permission status:", audioRecordingPermission.status);
-
-      if (mediaLibraryPermission.status === "granted" && audioRecordingPermission.status === "granted") {
-        console.log("Permissions granted, opening document picker...");
-        const result = await DocumentPicker.getDocumentAsync({
-          type: "audio/*",
+      console.log('Opening file picker...');
+      const result = await DocumentPicker.getDocumentAsync({ type: 'audio/*' });
+      console.log('File picker result:', JSON.stringify(result, null, 2));
+  
+      if (result.assets && result.assets.length > 0) {
+        const selectedFile = result.assets[0];
+        console.log('File picked successfully:', JSON.stringify(selectedFile, null, 2));
+        setAudioFile({
+          uri: selectedFile.uri,
+          type: selectedFile.mimeType || 'audio/mpeg',
+          name: selectedFile.name,
         });
-
-        console.log("Document Picker Result:", result);
-
-        if (!result.canceled) {
-          const file = result.assets[0];
-          console.log("File selected:", file.uri);
-          setAudioFile(file.uri);
-          setFileName(file.name); // Set the file name
-        } else {
-          console.log("File selection was canceled.");
-        }
+        setFileName(selectedFile.name);
       } else {
-        console.log("Permissions not granted.");
+        console.log('No file was selected or an unexpected error occurred.');
       }
-    } catch (err) {
-      if (err.name === "Cancel") {
-        console.log("User cancelled the picker, no action needed");
-      } else {
-        console.error("Error picking file:", err);
-        throw err;
-      }
+    } catch (error) {
+      console.error('Error picking file:', error);
     }
   };
+  
 
+  const handleAudioUpload = async () => {
+    if (!audioFile || !audioFile.uri) {
+      console.warn('No audio file selected for upload.');
+      return;
+    }
+
+    console.log('Preparing to upload audio file:', JSON.stringify(audioFile, null, 2));
+
+    const formData = new FormData();
+    formData.append('audio', {
+      uri: audioFile.uri,
+      type: audioFile.type,
+      name: audioFile.name,
+    });
+
+    try {
+      console.log('Sending request to upload file:', audioFile.name);
+      const response = await fetch('https://audioheroku-b0fe11645fe4.herokuapp.com/api/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Upload successful. Server response:', JSON.stringify(result, null, 2));
+      } else {
+        console.warn('Upload failed. HTTP status:', response.status);
+      }
+    } catch (error) {
+      console.error('Upload failed with error:', error);
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <View style={styles.frame}>
@@ -91,10 +86,13 @@ const UploadAudioScreen = () => {
         <Text style={styles.label}>Select an audio file:</Text>
         <TouchableOpacity onPress={pickFile} style={styles.uploadImageContainer}>
           {audioFile ? (
-            <Text style={styles.fileName}>{fileName}</Text>
+            <Image
+              source={{ uri: 'file://' + audioFile.uri }}
+              style={styles.uploadImage}
+            />
           ) : (
             <Image
-              source={require("../assets/UploadButton.png")}
+              source={require('../assets/UploadButton.png')}
               style={styles.uploadImage}
             />
           )}
@@ -104,14 +102,14 @@ const UploadAudioScreen = () => {
         <Picker
           style={styles.picker}
           selectedValue={audioType}
-          onValueChange={(itemValue, itemIndex) => setAudioType(itemValue)}
+          onValueChange={(itemValue) => setAudioType(itemValue)}
         >
           <Picker.Item label="MP3" value="mp3" />
           <Picker.Item label="WAV" value="wav" />
           <Picker.Item label="M4A" value="m4a" />
         </Picker>
 
-        <TouchableOpacity onPress={handleAudioUpload} style={styles.calculateButton}>
+        <TouchableOpacity onPress={() => handleAudioUpload(audioFile)} style={styles.calculateButton}>
           <Text style={styles.calculateText}>Upload Audio</Text>
         </TouchableOpacity>
       </View>
@@ -177,7 +175,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 20,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center", 
   },
   uploadImage: {
     width: 300,
@@ -191,12 +189,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 20,
     paddingHorizontal: 10,
-  },
-  fileName: {
-    textAlign: "center",
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: "bold",
   },
   calculateButton: {
     backgroundColor: "#0B3954",
