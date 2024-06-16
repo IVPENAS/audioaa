@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Image } from 'react-native';
 
-import Home from '../navbuttons/HomeScreen';
+/* import Home from '../navbuttons/[redact]HomeScreen'; */
 import ActionsScreen from '../navbuttons/ActionsScreen';
 import Notifications from '../navbuttons/NotificationsScreen';
 import Profile from '../navbuttons/ProfileScreen';
@@ -16,6 +16,7 @@ import ProfileIcon from '../assets/ProfileIcon.png';
 import UploadAudioScreen from '../trackers/UploadAudioScreen';
 import RecordAudioScreen from '../trackers/RecordAudioScreen';
 import AudioFilesScreen from '../trackers/AudioFilesScreen';
+import PlaybackScreen from '../trackers/PlaybackScreen';
 import MoreScreen from '../trackers/MoreScreen';
 import MoodStatsScreen from '../trackers/MoodStatsScreen';
 
@@ -28,6 +29,7 @@ const ActionsStack = () => (
     <Stack.Screen name="UploadAudioScreen" component={UploadAudioScreen} options={{ headerShown: false }} />
     <Stack.Screen name="RecordAudioScreen" component={RecordAudioScreen} options={{ headerShown: false }} />
     <Stack.Screen name="AudioFilesScreen" component={AudioFilesScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="PlaybackScreen" component={PlaybackScreen} options={{ headerShown: false }} />
     <Stack.Screen name="MoreScreen" component={MoreScreen} options={{ headerShown: false }} />
     <Stack.Screen name="MoodStatsScreen" component={MoodStatsScreen} options={{ headerShown: false }} />
   </Stack.Navigator>
@@ -46,7 +48,7 @@ const LandingPage = () => {
         },
       }}
     >
-      <Tab.Screen
+{/*       <Tab.Screen
         name="Home"
         component={Home}
         options={{
@@ -55,7 +57,7 @@ const LandingPage = () => {
             <Image source={HomeIcon} style={{ tintColor: color, width: size, height: size }} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Actions"
         component={ActionsStack}

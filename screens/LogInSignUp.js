@@ -1,4 +1,3 @@
-//loginSignup.js
 import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import LogoImage2 from '../assets/authcheck-lightlogo.png';

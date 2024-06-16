@@ -1,4 +1,4 @@
-//loginpage.js
+
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import UserProfile from '../assets/UserProfile.png';
@@ -24,7 +24,7 @@ const LogInPage = ({navigation}) => {
         <Text style={styles.subTitles}>Username or Email</Text>
         <TextInput style={styles.input} placeholder="Username or Email" />
 
-        <Text style={styles.subTitles}>Password</Text> 
+        <Text style={styles.subTitles}>Password</Text>
         <TextInput style={styles.input} placeholder="Enter your Password" secureTextEntry/>
 
         <TouchableOpacity style={styles.logInButton} onPress={goToLandingPage}>

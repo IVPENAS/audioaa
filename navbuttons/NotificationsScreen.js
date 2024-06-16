@@ -1,152 +1,115 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, Pressable, TouchableOpacity, FlatList} from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
-function NotificationsScreen({ route }) {
-  const [recordings, setRecordings] = useState(route.params.recordings); 
-
-
-  /* Plays the sound */
-  const playSound = async (sound) => {
-    await sound.replayAsync();
-  };
-
-  const clearRecordings = () => {
-    setRecordings([]); // Set recordings to an empty array
-  };
-
+const NotificationsScreen = () => {
   return (
-    <View>
-
-      <View>
-        <Text style={styles.AllRecordings}> All Recordings </Text>
+    <View style={styles.container}>
+      <View style={styles.frame}>
+        <View style={styles.accent} />
       </View>
-
-      {/* Clear */}
-      <TouchableOpacity title='Clear' style={[styles.centeredContent]} onPress={clearRecordings}>
-      <View style={styles.iconContainer}>
-        <FontAwesome5 name="trash" size={20} color="#0B3954" style={styles.triangle}/>
-        <Text style = {styles.IconText}>Clear All</Text>
+      <View style={styles.fillOut}>
+        <Text style={styles.notification}>
+          NOTIFICATIONS
+        </Text>
+      <View style={styles.Notif1}>
+        <Text>You recorded 19 audios today.</Text>
       </View>
-      </TouchableOpacity>
-
-      
-      
-      {/* If Recordings is 0 display message */}
-      {recordings.length === 0 ? (
-        <Text style={styles.emptyMessage}>Empty Playback List, Please Record an Audio</Text>
-      ) : (
-        recordings.map((recording, index) => (
-        <View key={index} style={styles.row}>
-        
-        {/* Display Recorded List */}
-        
-        <TouchableOpacity style={styles.recordButton} onPress={() => playSound(recording.sound)}>
-          <FontAwesome5 name="play" size={15} color="white" style={styles.triangle}/>
-        </TouchableOpacity>
-          <Text>Recording {index + 1}</Text>
-        </View>
-        ))
-      )}
+      <View style={styles.Notif2}>
+        <Text>File record21010824.wav is Real.</Text>
+      </View>
+      <View style={styles.Notif3}>
+        <Text>File record22010824.wav is Real.</Text>
+      </View>
+      <View style={styles.Notif4}>
+        <Text>File record23010824.wav is Real.</Text>
+      </View>
+      <View style={styles.Notif4}>
+        <Text>File record24010824.wav is Fakes.</Text>
+      </View>     
+      </View>
     </View>
   );
-}
-/* <FlatList
-      data={recordings}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item, index }) => (
-        // ... your renderItem content
-      )}
-    />
-  )} */
-
-export default NotificationsScreen;
+};
 
 const styles = StyleSheet.create({
-playbackContainer : {
-flex: 1,
-height: 30,
-justifyContent: 'center'
-},
-playbackBackground : {
-height: 3,
-width: 310,
-left: 40,
-backgroundColor: 'gainsboro',
-borderRadius: 5,
-},
-/* Row Layout */
-row: {
-flexDirection: 'row',
-alignItems: 'center',
-justifyContent: 'center',
-top: 100,
-margin: 5,
-padding: 15,
-marginLeft: 10,
-marginRight: 10,
-bottom: '0.2',
-backgroundColor: 'white',
-alignItems: 'center',
-borderRadius: 5,
-shadowColor: "#000",
-shadowOffset: {
-width: 0,
-height: 2,
-},
-shadowOpacity: 0.25,
-shadowRadius: 3.84,
-elevation: 5,
-gap: 10
-},
-/* All Recording Text */
-AllRecordings: {
-left: 10,
-top: 25,
-paddingTop: 5,
-fontWeight: 'bold',
-fontSize: 15,
-color: '#0B3954'
-},
-/* Play Button */
-recordButton : {
-width: 50,
-height: 50,
-right: 100,
-borderRadius: 60,
-borderWidth: 2,
-borderColor: '#0B3954',
-padding: 3,
-alignItems: 'center',
-justifyContent: 'center',
-backgroundColor: '#0B3954',
-},
-/* Empty Message when the recording is empty */
-emptyMessage: {
-fontSize: 16,
-color: 'grey',
-textAlign: 'center',
-marginTop: 250,
-},
-/* Triangle in the Play */
-triangle:{
-left: 2
-},
-/* Clear Button */
-iconContainer: {
-top: 50,
-left: 150,
-alignItems: 'center',
-justifyContent: 'center',
-},
-centeredContent: {
-alignItems: 'center',
-},
-IconText:{
-paddingTop: 5,
-fontWeight: 'bold',
-fontSize: 13,
-color: '#0B3954'
-},
+  container: {
+    flex: 1,
+    bottom: '0%'
+  },
+  frame: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: 'white', 
+    paddingHorizontal: 10,
+  },
+  accent: {
+    flex: 1,
+    position: 'absolute', 
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: '70%',
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+    backgroundColor: '#0B3954', 
+  },
+  fillOut: {
+    flex: 1,
+    position: 'absolute', 
+    top: '20%', 
+    bottom: '08%',
+    left: '7%',
+    right: '7%',
+    backgroundColor: '#F5F5F5',
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    elevation: 5,
+  },
+  notification: {
+    fontWeight: 'bold',
+    fontSize: 29,
+    position: 'absolute',
+    color: 'white',
+    marginTop: -100,
+
+  },
+  Notif1: {
+    backgroundColor: 'lightgrey',
+    paddingVertical: 19,
+    borderRadius: 15,
+    marginTop: 20,
+    alignItems: 'center',
+    bottom:'3%'
+  },
+  Notif2: {
+    backgroundColor: 'lightgrey',
+    paddingVertical: 19,
+    borderRadius: 15,
+    marginTop: 20,
+    alignItems: 'center',
+    bottom:'3%'
+  },
+  Notif3: {
+    backgroundColor: 'lightgrey',
+    paddingVertical: 19,
+    borderRadius: 15,
+    marginTop: 20,
+    alignItems: 'center',
+    bottom:'3%'
+  },
+  Notif4: {
+    backgroundColor: 'light grey',
+    paddingVertical: 19,
+    borderRadius: 10,
+    marginTop: 20,
+    alignItems: 'center',
+    bottom:'3%'
+  },
+
 });
+
+export default NotificationsScreen;

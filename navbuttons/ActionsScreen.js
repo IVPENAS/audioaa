@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 import UploadAudio from '../assets/UploadAudio.png';
 import RecordAudio from '../assets/RecordAudio.png';
-import AudioFiles from '../assets/AudioFiles.png';
 import More from '../assets/More.png';
 import next from '../assets/next.png';
 
@@ -15,9 +14,6 @@ import next from '../assets/next.png';
     };
     const goToRecordAudioScreen = () => {
       navigation.navigate('RecordAudioScreen');
-    };
-    const goToAudioFilesScreen = () => {
-      navigation.navigate('AudioFilesScreen');
     };
     const goToMoreScreen= () => {
       navigation.navigate('MoreScreen');
@@ -42,12 +38,6 @@ import next from '../assets/next.png';
           <Pressable style={styles.recordButton} onPress={goToRecordAudioScreen}>
             <Image source={RecordAudio} style={styles.image} />
               <Text style={[styles.boldText, styles.biggerText]}> Record Audio</Text>
-            <Image source={next} style={styles.next} />
-          </Pressable>
-
-          <Pressable style={styles.filesButton} onPress={goToAudioFilesScreen}>
-            <Image source={AudioFiles} style={styles.image} />
-              <Text style={[styles.boldText, styles.biggerText]}> Audio Files</Text>
             <Image source={next} style={styles.next} />
           </Pressable>
 
@@ -132,13 +122,13 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   actionsButtons: {
-    marginTop: 20,
+    marginTop: 25,
   },
   uploadButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#CDEDFD',
-    paddingVertical: 25,
+    paddingVertical: 50,
     paddingHorizontal: 10,
     marginVertical: 5,
     borderRadius: 30,
@@ -149,14 +139,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#A9F8FB',
-    paddingVertical: 25,
+    paddingVertical: 50,
     paddingHorizontal: 10,
     marginVertical: 5,
     borderRadius: 30,
     borderColor: '#0B3954',
     elevation: 5,
   },
-  filesButton: {
+/*   filesButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#B6DCFE',
@@ -166,12 +156,12 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderColor: '#0B3954',
     elevation: 5,
-  },
+  }, */
   moreButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#22FFEF',
-    paddingVertical: 25,
+    paddingVertical: 50,
     paddingHorizontal: 10,
     marginVertical: 5,
     borderRadius: 30,
