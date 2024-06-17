@@ -1,9 +1,12 @@
-//server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
 const { GridFsStorage } = require('multer-gridfs-storage');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 const app = express();
 
 // MongoDB URI from environment variable
