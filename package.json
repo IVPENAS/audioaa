@@ -9,8 +9,8 @@
     "web": "expo start --web"
   },
     "engines": {
-      "node": ">=14.0.0",
-      "npm":  ">=6.0.0"
+      "node": "18.17.1",
+      "npm":  "10.2.4"
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.1",
