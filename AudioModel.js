@@ -1,4 +1,3 @@
-//AudioModel.js
 const mongoose = require('mongoose');
 
 const AudioSchema = new mongoose.Schema({
@@ -6,28 +5,32 @@ const AudioSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  classification: {
+  originalFileName: {
     type: String,
-    required: false
+    required: true
   },
   uploadDate: {
     type: Date,
     default: Date.now
   },
-  duration: {
-    type: Number,
-    required: false
-  },
   metadata: {
-    type: Map,
-    of: String,
-    required: false
+    format: {
+      type: String,
+      required: true
+    },
+    size: {
+      type: Number,
+      required: true
+    }
   },
-  uploadedBy: {
-    type: String,
-    required: false
+  isFake: {
+    type: Boolean,
+    required: true
+  },
+  mongoFileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
   }
-  // Add any other fields that are relevant to your application
 });
 
 module.exports = mongoose.model('Audio', AudioSchema);

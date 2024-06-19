@@ -17,21 +17,19 @@ import UploadAudioScreen from '../trackers/UploadAudioScreen';
 import RecordAudioScreen from '../trackers/RecordAudioScreen';
 import AudioFilesScreen from '../trackers/AudioFilesScreen';
 import PlaybackScreen from '../trackers/PlaybackScreen';
-import MoreScreen from '../trackers/MoreScreen';
-import MoodStatsScreen from '../trackers/MoodStatsScreen';
+import AudioList from '../trackers/AudioList';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const ActionsStack = () => (
   <Stack.Navigator>
-    <Stack.Screen name="ActionsScreen" component={ActionsScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="UploadAudioScreen" component={UploadAudioScreen} options={{ headerShown: false }} />
     <Stack.Screen name="RecordAudioScreen" component={RecordAudioScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="UploadAudioScreen" component={UploadAudioScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="ActionsScreen" component={ActionsScreen} options={{ headerShown: false }} />
     <Stack.Screen name="AudioFilesScreen" component={AudioFilesScreen} options={{ headerShown: false }} />
     <Stack.Screen name="PlaybackScreen" component={PlaybackScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="MoreScreen" component={MoreScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="MoodStatsScreen" component={MoodStatsScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="AudioList" component={AudioList} options={{ headerShown: false }} />
   </Stack.Navigator>
 );
 
@@ -59,7 +57,7 @@ const LandingPage = () => {
         }}
       /> */}
       <Tab.Screen
-        name="Actions"
+        name="Main"
         component={ActionsStack}
         options={{
           headerShown: false,

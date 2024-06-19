@@ -15,8 +15,8 @@ import next from '../assets/next.png';
     const goToRecordAudioScreen = () => {
       navigation.navigate('RecordAudioScreen');
     };
-    const goToMoreScreen= () => {
-      navigation.navigate('MoreScreen');
+    const goToAudioList= () => {
+      navigation.navigate('AudioList');
     };
 
   return (
@@ -41,7 +41,7 @@ import next from '../assets/next.png';
             <Image source={next} style={styles.next} />
           </Pressable>
 
-          <Pressable style={styles.moreButton} onPress={goToMoreScreen}> 
+          <Pressable style={styles.moreButton} onPress={goToAudioList}> 
             <Image source={More} style={styles.image} />
               <Text style={[styles.boldText, styles.biggerText]}> More</Text>
             <Image source={next} style={styles.next} />

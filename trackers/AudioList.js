@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const AudioFilesScreen = ({ route }) => {
+const AudioList = ({ route }) => {
   const navigation = useNavigation();
-  const { recordingsList } = route.params || { recordingsList: [] }; // Handle the case where route.params might be undefined
+  const { recordingsList } = route.params || { recordingsList: [] };
 
   return (
     <View style={styles.container}>
@@ -64,4 +64,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AudioFilesScreen;
+export default AudioList;

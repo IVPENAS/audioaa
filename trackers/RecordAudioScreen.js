@@ -15,7 +15,7 @@ export default function App() {
   const animatedValue = useRef(new Animated.Value(0)).current; // Reference to animated value
   const animatedOpacityCircle2 = useRef(new Animated.Value(0)).current; //Opacity Animation - Circle 2
   const animatedOpacityAnimatedCircle = useRef(new Animated.Value(0)).current; //Opacity Animation - Animated Circle
-
+  const navigation = useNavigation();
 
   //Permission
   useEffect(() => {
@@ -109,6 +109,19 @@ export default function App() {
       }
     }, [recordingStatus, elapsedTime]);
 
+  // Function to calculate and display bitrate
+  const calculateBitrate = async (filePath) => {
+    try {
+      const info = await FileSystem.getInfoAsync(filePath);
+      const fileSize = info.size; // Size in bytes
+      const { durationMillis } = await recording.getStatusAsync(); // Duration in milliseconds
+      const duration = durationMillis / 1000; // Duration in seconds
+      const bitrate = (fileSize * 8) / duration; // Bitrate in bits per second
+      console.log(`Bitrate: ${bitrate.toFixed(2)} bps`);
+    } catch (error) {
+      console.error('Failed to calculate bitrate', error);
+    }
+  };
 
   //Start Recording
   async function startRecording() {
@@ -156,6 +169,8 @@ export default function App() {
           uri: filePath,
           name: fileName,
         }]);
+        // Calculate and display the bitrate
+        await calculateBitrate(filePath);
 
         setRecording(null);
         setRecordingStatus('idle'); // Set status back to idle
@@ -174,9 +189,11 @@ export default function App() {
   }
 
   /* Data Navigation to Audio List Screen */
-  const navigation = useNavigation();
   function goToAudioList() {
-    navigation.navigate('AudioFilesScreen', { recordingsList });
+    navigation.navigate('AudioList', { recordingsList });
+  }
+  function goToUploadAudioScreen() {
+    navigation.navigate('UploadAudioScreen');
   }
 
   return (
@@ -245,6 +262,15 @@ export default function App() {
         </View>
       </TouchableOpacity>
 
+      {/* Upload Button */}
+      <TouchableOpacity style = {styles.uploadButton} onPress={goToUploadAudioScreen} >
+        <View style={styles.iconContainer}>
+          <FontAwesome5 name="download" size={25} color="#0B3954"/>
+          <Text style = {styles.IconText}>
+            Upload
+          </Text>
+        </View>
+      </TouchableOpacity>
       </View>
     </View>
   );
@@ -259,6 +285,7 @@ flex: 1,
 button: {
 alignItems: 'center',
 justifyContent: 'center',
+bottom: -30,
 width: 65,
 height: 65,
 borderRadius: 64,
@@ -283,8 +310,12 @@ justifyContent: 'center'
 /* View All Layout */
 viewAll: {
 left: -120,
-bottom: 55
+bottom: 25
 },
+uploadButton: {
+left: 120,
+bottom: 75
+  },
 IconText:{
 paddingTop: 5,
 fontWeight: 'bold',
